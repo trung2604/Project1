@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SongRespository extends JpaRepository<Song, Long> {
     boolean existsByFilePath(String filePath);
+    Song findByFilePath(String filePath);
+    Song findSongById(long id);
 }

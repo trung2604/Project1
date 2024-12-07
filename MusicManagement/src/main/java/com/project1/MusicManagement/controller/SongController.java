@@ -1,13 +1,10 @@
 package com.project1.MusicManagement.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import com.project1.MusicManagement.repository.SongRespository;
+import com.mpatric.mp3agic.InvalidDataException;
+import com.mpatric.mp3agic.UnsupportedTagException;
+import com.project1.MusicManagement.entity.Song;
+import com.project1.MusicManagement.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,99 +12,113 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.mpatric.mp3agic.Mp3File;
-import com.project1.MusicManagement.entity.Song;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/songs")
 public class SongController {
-    @Value("${song.upload.dir}")
-    private String uploadDir;
+
     @Autowired
-    private SongRespository songRepository;
+    private SongService songService;
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+    // Upload bài hát
+    @PostMapping("/upload/{userId}")
+    public ResponseEntity<String> uploadSong(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
         try {
-            // Tạo thư mục 'upload' nếu chưa tồn tại
-            File uploadDirectory = new File(uploadDir);
-            if (!uploadDirectory.exists()) {
-                uploadDirectory.mkdirs();
-            }
-
-            // Lưu file vào thư mục 'upload'
-            String filePath = uploadDir + "/" + file.getOriginalFilename();
-            File savedFile = new File(filePath);
-            file.transferTo(savedFile);
-
-            // Đọc metadata từ file MP3
-            Mp3File mp3File = new Mp3File(savedFile);
-
-            String title = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getTitle() : "Unknown Title";
-            String artist = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getArtist() : "Unknown Artist";
-            String album = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getAlbum() : "Unknown Album";
-            String genre = mp3File.hasId3v2Tag() && mp3File.getId3v2Tag().getGenreDescription() != null
-                    ? mp3File.getId3v2Tag().getGenreDescription()
-                    : "Unknown Genre";
-            long duration = mp3File.getLengthInSeconds(); // Thời lượng tính theo giây
-
-            // Lưu thông tin vào cơ sở dữ liệu
-            Song song = new Song();
-            song.setTitle(title);
-            song.setArtist(artist);
-            song.setAlbum(album);
-            song.setGenre(genre);
-            song.setFilePath(filePath);
-            song.setDuration(duration);
-            song.setFavorited(false); // Thiết lập giá trị mặc định cho isFavorited
-            songRepository.save(song);
-
-            return ResponseEntity.ok("File uploaded and saved successfully!");
+            songService.uploadSong(file, userId);
+            return ResponseEntity.ok("Song uploaded successfully!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the song.");
         }
     }
 
- // Endpoint để phát nhạc
+    // Xóa bài hát
+    @DeleteMapping("/delete/{id}/{userId}")
+    public ResponseEntity<String> deleteSong(
+            @PathVariable Long id,
+            @PathVariable Long userId) {
+        try {
+            songService.deleteSong(id, userId);
+            return ResponseEntity.ok("Song deleted successfully!");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the song.");
+        }
+    }
+    // Cập nhật bài hát
+    @PutMapping("/update/{id}/{userId}")
+    public ResponseEntity<Song> updateSong(
+            @PathVariable Long id,           // Lấy ID bài hát từ URL
+            @PathVariable Long userId,       // Lấy ID người dùng từ URL
+            @RequestParam("file") MultipartFile file) {  // Lấy file bài hát từ request body
+        try {
+            // Gọi service để cập nhật bài hát
+            Song updatedSong = songService.updateSong(id, file, userId);
+            return ResponseEntity.ok(updatedSong);  // Trả về bài hát đã cập nhật
+        } catch (RuntimeException e) {
+            // Trả về lỗi nếu không có quyền hoặc bài hát không tìm thấy
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        } catch (IOException | UnsupportedTagException | InvalidDataException e) {
+            // Trả về lỗi trong trường hợp có lỗi khi xử lý file hoặc metadata
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Trả về lỗi chung trong trường hợp không xác định
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // Lấy thông tin bài hát theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Song> getSongById(@PathVariable Long id) {
+        try {
+            Song song = songService.getSongById(id);
+            return ResponseEntity.ok(song);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // Lấy danh sách tất cả bài hát
+    @GetMapping("/all")
+    public ResponseEntity<List<Song>> getAllSongs() {
+        try {
+            List<Song> songs = songService.getAllSongs();
+            return ResponseEntity.ok(songs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    // Phát nhạc
     @GetMapping("/play/{id}")
     public ResponseEntity<InputStreamResource> playSong(@PathVariable Long id) {
-        // Tìm bài hát từ cơ sở dữ liệu
-        Song song = songRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Song not found"));
-
-        String filePath = song.getFilePath();
-        File file = new File(filePath);
-
         try {
+            File file = songService.getSongFile(id);
             FileInputStream fileInputStream = new FileInputStream(file);
             InputStreamResource resource = new InputStreamResource(fileInputStream);
 
-            // Trả về ResponseEntity để stream file MP3
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("audio/mpeg"))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName())
                     .body(resource);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IOException e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
-    @GetMapping("/getAll")
-    public ResponseEntity<List<Song>> getAllSongs() {
-        List<Song> songs = songRepository.findAll();
-        return ResponseEntity.ok(songs);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteSong(@PathVariable Long id) {
-        if (songRepository.existsById(id)) {
-            songRepository.deleteById(id);
-            return ResponseEntity.ok("Song deleted successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Song not found!");
-        }
-    }
-
 }

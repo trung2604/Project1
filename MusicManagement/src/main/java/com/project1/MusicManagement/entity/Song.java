@@ -24,4 +24,13 @@ public class Song {
     private long duration;
     @Column(name = "is_favorited", nullable = false)
     private boolean isFavorited = false;
+    public Song(long duration, String title, String artist, String album, String genre, String filePath, boolean isFavorited) {
+        this.duration = duration;
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.genre = genre;
+        this.filePath = filePath;
+        this.isFavorited = isFavorited;
+    }
 }
