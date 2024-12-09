@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="shortcut icon" href="/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/css/play.css">
+</head>
+<body>
+<h1>Music Player</h1>
+
+<!-- Thông tin bài hát -->
+<div id="songDetails">
+    <img id="songImage" src="/default-image.jpg" alt="Song Cover" style="width: 300px; height: 300px; border-radius: 10px; margin-bottom: 10px;">
+    <h2 id="songTitle">Song Title</h2>
+    <p id="songArtist">Artist: Unknown Artist</p>
+    <p id="songAlbum">Album: Unknown Album</p>
+    <p id="songGenre">Genre: Unknown Genre</p>
+</div>
+
+<!-- Nút Play và thanh tiến trình -->
+<audio id="audioPlayer" controls>
+    Your browser does not support the audio element.
+</audio>
+
+<input id="progress" type="range" min="0" max="100" value="0" style="width: 100%;">
+
+<script src="/js/play.js"></script>
+</body>
+</html>

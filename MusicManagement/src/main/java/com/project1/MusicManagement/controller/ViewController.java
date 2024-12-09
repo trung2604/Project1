@@ -10,6 +10,10 @@ public class ViewController {
 
     @GetMapping()
     public String showHomePage() {
-        return "index";
+        return "home";
+    }
+    @GetMapping("/play")
+    public String showPlayPage() {
+        return "play";
     }
 }

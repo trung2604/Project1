@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Music Player</title>
+    <link rel="shortcut icon" href="/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+<h1>Song List</h1>
+<ul class="song-list" id="songList">
+    <!-- Songs will be dynamically added here -->
+</ul>
+
+<script>
+    async function fetchSongs() {
+        try {
+            const response = await fetch('/api/songs/all'); // API để lấy tất cả bài hát
+            if (!response.ok) {
+                throw new Error('Failed to fetch songs');
+            }
+            const songs = await response.json();
+
+            const songList = document.getElementById('songList');
+            songs.forEach(song => {
+                const listItem = document.createElement('li');
+                listItem.className = 'song-item';
+                listItem.innerHTML = `
+                        <span>${song.title} - ${song.artist}</span>
+                        <button onclick="playSong(${song.id})">Play</button>
+                    `;
+                songList.appendChild(listItem);
+            });
+        } catch (error) {
+            console.error('Error fetching songs:', error);
+            alert('Unable to fetch songs. Please try again later.');
+        }
+    }
+
+    function playSong(songId) {
+        // Chuyển hướng sang trang play với songId
+        window.location.href = `/api/songs/play?songId=${songId}`;
+    }
+
+    // Gọi hàm khi trang được load
+    document.addEventListener('DOMContentLoaded', fetchSongs);
+</script>
+</body>
+</html>

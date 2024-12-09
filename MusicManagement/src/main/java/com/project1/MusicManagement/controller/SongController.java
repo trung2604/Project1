@@ -2,6 +2,7 @@ package com.project1.MusicManagement.controller;
 
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import com.project1.MusicManagement.dto.SongDetails;
 import com.project1.MusicManagement.entity.Song;
 import com.project1.MusicManagement.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -58,35 +61,42 @@ public class SongController {
     }
     // Cập nhật bài hát
     @PutMapping("/update/{id}/{userId}")
-    public ResponseEntity<Song> updateSong(
-            @PathVariable Long id,           // Lấy ID bài hát từ URL
-            @PathVariable Long userId,       // Lấy ID người dùng từ URL
-            @RequestParam("file") MultipartFile file) {  // Lấy file bài hát từ request body
+    public ResponseEntity<?> updateSong(
+            @PathVariable Long id,
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
         try {
-            // Gọi service để cập nhật bài hát
             Song updatedSong = songService.updateSong(id, file, userId);
-            return ResponseEntity.ok(updatedSong);  // Trả về bài hát đã cập nhật
+            return ResponseEntity.ok(updatedSong);
         } catch (RuntimeException e) {
-            // Trả về lỗi nếu không có quyền hoặc bài hát không tìm thấy
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } catch (IOException | UnsupportedTagException | InvalidDataException e) {
-            // Trả về lỗi trong trường hợp có lỗi khi xử lý file hoặc metadata
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while saving the file: " + e.getMessage());
+        } catch (UnsupportedTagException | InvalidDataException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error while processing metadata: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            // Trả về lỗi chung trong trường hợp không xác định
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred: " + e.getMessage());
         }
     }
 
+
     // Lấy thông tin bài hát theo ID
     @GetMapping("/{id}")
-    public ResponseEntity<Song> getSongById(@PathVariable Long id) {
+    public ResponseEntity<SongDetails> getSongById(@PathVariable Long id) {
         try {
-            Song song = songService.getSongById(id);
-            return ResponseEntity.ok(song);
+            // Lấy thông tin bài hát từ service
+            SongDetails songDetails = songService.getSongById(id);
+
+            // Trả về SongDetails dưới dạng JSON
+            return ResponseEntity.ok(songDetails);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            // Trả về lỗi 404 nếu bài hát không tìm thấy
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null); // Trả về null hoặc bạn có thể tạo một đối tượng lỗi riêng
         }
     }
 
@@ -106,17 +116,27 @@ public class SongController {
     @GetMapping("/play/{id}")
     public ResponseEntity<InputStreamResource> playSong(@PathVariable Long id) {
         try {
+            // Lấy file bài hát từ dịch vụ
             File file = songService.getSongFile(id);
+
+            // Mã hóa tên file để tránh lỗi với ký tự Unicode
+            String encodedFileName = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.toString());
+            encodedFileName = encodedFileName.replaceAll("\\+", "%20"); // Đảm bảo thay thế dấu cộng thành %20
+
+            // Đọc file và tạo InputStreamResource
             FileInputStream fileInputStream = new FileInputStream(file);
             InputStreamResource resource = new InputStreamResource(fileInputStream);
 
+            // Trả về file âm thanh với header Content-Disposition đã mã hóa tên file
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("audio/mpeg"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline;filename=" + file.getName())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedFileName + "\"")
                     .body(resource);
         } catch (RuntimeException e) {
+            // Nếu không tìm thấy bài hát
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IOException e) {
+            // Nếu có lỗi đọc file
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
