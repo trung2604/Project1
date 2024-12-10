@@ -12,19 +12,44 @@
 
 <!-- Thông tin bài hát -->
 <div id="songDetails">
-    <img id="songImage" src="/default-image.jpg" alt="Song Cover" style="width: 300px; height: 300px; border-radius: 10px; margin-bottom: 10px;">
+    <img id="songImage" src="" alt="Song Image" />
     <h2 id="songTitle">Song Title</h2>
     <p id="songArtist">Artist: Unknown Artist</p>
     <p id="songAlbum">Album: Unknown Album</p>
     <p id="songGenre">Genre: Unknown Genre</p>
+    <p id="songDuration">Duration: 0:00</p>
 </div>
 
-<!-- Nút Play và thanh tiến trình -->
-<audio id="audioPlayer" controls>
-    Your browser does not support the audio element.
-</audio>
+<!-- Điều khiển phát nhạc -->
+<div id="controls">
+    <button id="prevButton">⏮</button>
+    <button id="playPauseButton">▶️</button>
+    <button id="nextButton">⏭</button>
+    <div id="playbackControl">
+        <label for="playbackRate">Speed:</label>
+        <select id="playbackRate">
+            <option value="0.5">0.5x</option>
+            <option value="1" selected>1x</option>
+            <option value="1.5">1.5x</option>
+            <option value="2">2x</option>
+        </select>
+    </div>
+</div>
 
-<input id="progress" type="range" min="0" max="100" value="0" style="width: 100%;">
+<!-- Thanh tiến trình -->
+<div id="progressContainer">
+    <span id="currentTime">0:00</span>
+    <input id="progress" type="range" min="0" max="100" value="0">
+    <span id="totalTime">0:00</span>
+</div>
+
+<!-- Danh sách phát -->
+<div id="playlist">
+    <h3>Playlist</h3>
+    <ul id="playlistItems">
+        <!-- Sẽ được cập nhật qua JS -->
+    </ul>
+</div>
 
 <script src="/js/play.js"></script>
 </body>

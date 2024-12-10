@@ -21,6 +21,7 @@ public class Song {
     private String album;
     private String genre;
     private String filePath;
+    private String imgPath;
     private long duration;
     @Column(name = "is_favorited", nullable = false)
     private boolean isFavorited = false;

@@ -6,13 +6,13 @@ import com.project1.MusicManagement.dto.SongDetails;
 import com.project1.MusicManagement.entity.Song;
 import com.project1.MusicManagement.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.InputStreamResource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,6 +59,7 @@ public class SongController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while deleting the song.");
         }
     }
+
     // Cập nhật bài hát
     @PutMapping("/update/{id}/{userId}")
     public ResponseEntity<?> updateSong(
@@ -82,7 +83,6 @@ public class SongController {
                     .body("An unexpected error occurred: " + e.getMessage());
         }
     }
-
 
     // Lấy thông tin bài hát theo ID
     @GetMapping("/{id}")

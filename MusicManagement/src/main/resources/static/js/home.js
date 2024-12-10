@@ -11,9 +11,9 @@ async function fetchSongs() {
             const listItem = document.createElement('li');
             listItem.className = 'song-item';
             listItem.innerHTML = `
-                <span>${song.title} - ${song.artist}</span>
-                <button onclick="playSong(${song.id})">Play</button>
-            `;
+                        <span>${song.title} - ${song.artist}</span>
+                        <button onclick="playSong(${song.id})">Play</button>
+                    `;
             songList.appendChild(listItem);
         });
     } catch (error) {
@@ -23,8 +23,8 @@ async function fetchSongs() {
 }
 
 function playSong(songId) {
-    // Chuyển hướng tới URL với PathVariable
-    window.location.href = `/api/songs/play/?songId=${songId}`;
+    // Chuyển hướng sang trang play với songId
+    window.location.href = `/api/songs/play?songId=${songId}`;
 }
 
 // Gọi hàm khi trang được load

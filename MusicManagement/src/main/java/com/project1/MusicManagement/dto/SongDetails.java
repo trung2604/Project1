@@ -13,6 +13,6 @@ public class SongDetails {
     private String artist;
     private String album;
     private String genre;
-    private String imageUrl;
     private Long duration;
+    private String imgPath;
 }
