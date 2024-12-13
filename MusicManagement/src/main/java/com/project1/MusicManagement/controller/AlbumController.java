@@ -28,4 +28,12 @@ public class AlbumController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/genre/{genre}")
+    public ResponseEntity<List<Song>> getAlbumByGenre(@PathVariable String genre) {
+        List<Song> songs = albumService.getAlbumGenre(genre);
+        if (songs != null && !songs.isEmpty()) {
+            return ResponseEntity.ok(songs);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }

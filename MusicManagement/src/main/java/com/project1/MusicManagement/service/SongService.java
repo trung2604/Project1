@@ -79,10 +79,8 @@ public class SongService {
 
         // Kiểm tra nếu file đã tồn tại và tạo tên file mới nếu cần thiết
         int count = 1;
-        while (targetFile.exists()) {
-            String newFileName = fileName.substring(0, fileName.lastIndexOf(".")) + "_" + count + ".mp3";
-            targetFile = new File(uploadDir + File.separator + newFileName);
-            count++;
+        if(targetFile.exists()){
+            throw new RuntimeException("File already exists!");
         }
         file.transferTo(targetFile);
 
@@ -104,9 +102,6 @@ public class SongService {
         song.setImgPath(albumArtUrl);
         return songRepository.save(song);
     }
-
-
-
 
     // Xóa bài hát
     public void deleteSong(Long id, Long userId) {

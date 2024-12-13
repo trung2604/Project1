@@ -1,7 +1,5 @@
 package com.project1.MusicManagement.controller;
 
-import jakarta.annotation.Resource;
-import jakarta.persistence.criteria.Path;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
