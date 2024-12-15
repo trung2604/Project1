@@ -6,6 +6,9 @@
     --text-secondary: #bdc3c7;
     --accent-color: #3498db;
     --song-item-bg: rgba(44, 62, 80, 0.7);
+    --upload-btn-bg: #2ecc71;
+    --update-btn-bg: #f39c12;
+    --delete-btn-bg: #e74c3c;
 }
 
 * {
@@ -379,4 +382,107 @@ body {
 .song-list.list-view .play-btn {
     width: auto;
     padding: 8px 15px;
+}
+/* Song Management Section Enhancements */
+#song-management {
+    display: flex;
+    flex-direction: column;
+}
+
+.song-management-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.song-management-controls .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.song-management-controls .btn i {
+    margin-right: 10px;
+}
+
+.admin-only {
+    opacity: 1;
+    cursor: pointer;
+}
+
+#uploadSong {
+    background: var(--upload-btn-bg);
+}
+
+#updateSong {
+    background: var(--update-btn-bg);
+}
+
+#deleteSong {
+    background: var(--delete-btn-bg);
+}
+
+.song-management-controls .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#songManagementContent {
+    background: var(--song-item-bg);
+    border-radius: 10px;
+    padding: 20px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .song-management-controls {
+        flex-direction: column;
+    }
+
+    .song-management-controls .btn {
+        width: 100%;
+    }
+}
+
+/* Placeholder and Loading States */
+.placeholder-text {
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Alert and Notification Styles */
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.alert-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border: 1px solid #2ecc71;
+}
+
+.alert-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border: 1px solid #e74c3c;
+}
+
+/* File Input Styling (for uploads) */
+input[type="file"] {
+    display: none;
 }

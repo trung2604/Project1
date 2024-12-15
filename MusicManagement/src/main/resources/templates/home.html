@@ -39,10 +39,11 @@
                         <span>Recently Played</span>
                     </a>
                 </li>
+                <!-- Replace Settings with Song Management -->
                 <li class="menu-item">
-                    <a href="#settings" id="settingsLink">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
+                    <a href="#song-management" id="songManagementLink">
+                        <i class="fas fa-upload"></i>
+                        <span>Manage Songs</span>
                     </a>
                 </li>
             </ul>
@@ -104,9 +105,23 @@
             <p>No songs played recently.</p>
         </section>
 
-        <section id="settings" class="content-section hidden">
-            <h2>Settings</h2>
-            <p>Customize your experience.</p>
+        <!-- Song Management Section -->
+        <section id="song-management" class="content-section hidden">
+            <h2>Song Management</h2>
+            <div class="song-management-controls">
+                <button class="btn btn-primary admin-only" id="uploadSong">
+                    <i class="fas fa-upload"></i> Upload Song
+                </button>
+                <button class="btn btn-warning admin-only" id="updateSong">
+                    <i class="fas fa-edit"></i> Update Song
+                </button>
+                <button class="btn btn-danger admin-only" id="deleteSong">
+                    <i class="fas fa-trash"></i> Delete Song
+                </button>
+            </div>
+            <div id="songManagementContent">
+                <p>Select a song to manage its details.</p>
+            </div>
         </section>
     </main>
 </div>
