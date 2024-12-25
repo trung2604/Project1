@@ -28,7 +28,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             errorMessage.textContent = '';
 
             // Chuyển hướng đến trang home
-            window.location.href = '/api/songs';
+            window.location.href = '/api/admin';
         } else {
             errorMessage.textContent = data.message || 'Invalid username or password!';
             successMessage.textContent = '';

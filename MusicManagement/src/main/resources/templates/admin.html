@@ -1,0 +1,92 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musically - Admin Dashboard</title>
+    <link rel="shortcut icon" href="/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="/favicon/Musically.svg" alt="Musically Logo">
+                <h2>Musically Admin</h2>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <ul class="menu">
+                <li class="menu-item active">
+                    <a href="#song-management">
+                        <i class="fas fa-music"></i>
+                        <span>Manage Songs</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="/user.html">
+                        <i class="fas fa-user"></i>
+                        <span>User Dashboard</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <img src="/images/default-avatar.png" alt="Admin Avatar" class="user-avatar">
+                <div class="user-info">
+                    <span class="user-name">Admin</span>
+                    <span class="user-email">admin@musically.com</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="content-header">
+            <div class="header-left">
+                <h1>Song Management</h1>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <input type="text" placeholder="Search songs..." class="search-input">
+                    <button class="search-button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Song Management Section -->
+        <section id="song-management" class="content-section">
+            <div class="song-management-controls">
+                <button class="btn btn-primary" id="uploadSong">
+                    <i class="fas fa-upload"></i> Upload Song
+                </button>
+                <button class="btn btn-warning" id="updateSong">
+                    <i class="fas fa-edit"></i> Update Song
+                </button>
+                <button class="btn btn-danger" id="deleteSong">
+                    <i class="fas fa-trash"></i> Delete Song
+                </button>
+            </div>
+            <div class="song-list" id="songList">
+                <p>Loading songs...</p>
+            </div>
+            <div id="songManagementContent">
+                <p>Select a song to manage its details.</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="/js/admin.js"></script>
+</body>
+</html>
