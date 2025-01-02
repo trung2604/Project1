@@ -9,6 +9,12 @@ window.onload = function() {
 
 };
 
+// Logout function
+function logout() {
+    localStorage.removeItem('user');
+    window.location.href = '/api/auth/login';
+}
+
 let currentSongs = [];
 let selectedSongId = null;
 
@@ -24,6 +30,18 @@ async function fetchSongs() {
         alert('Failed to load songs');
     }
 }
+
+// Song search functionality
+document.getElementById('searchInput').addEventListener('input', function(event) {
+    const query = event.target.value.toLowerCase();
+    const filteredSongs = currentSongs.filter(song => {
+        return (song.title && song.title.toLowerCase().includes(query)) ||
+            (song.artist && song.artist.toLowerCase().includes(query)) ||
+            (song.genre && song.genre.toLowerCase().includes(query));
+    });
+    renderSongs(filteredSongs);
+});
+
 
 // Select song function
 function selectSong(songId) {

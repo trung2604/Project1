@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Musically - Admin Dashboard</title>
     <link rel="shortcut icon" href="/favicon/Musically.svg" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="/css/admin.css">
+
 </head>
 <body>
 <div class="dashboard-container">
@@ -20,30 +20,27 @@
             </div>
         </div>
 
-        <nav class="sidebar-menu">
-            <ul class="menu">
-                <li class="menu-item active">
-                    <a href="#song-management">
-                        <i class="fas fa-music"></i>
-                        <span>Manage Songs</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="/user.html">
-                        <i class="fas fa-user"></i>
-                        <span>User Dashboard</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<!--        <nav class="sidebar-menu">-->
+<!--            <ul class="menu">-->
+<!--                <li class="menu-item active">-->
+<!--                    <a href="#song-management">-->
+<!--                        <i class="fas fa-music"></i>-->
+<!--                        <span>Manage Songs</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </nav>-->
 
         <div class="sidebar-footer">
             <div class="user-profile">
-                <img src="/images/default-avatar.png" alt="Admin Avatar" class="user-avatar">
                 <div class="user-info">
                     <span class="user-name"></span>
                 </div>
             </div>
+            <button class="btn btn-logout" onclick="logout()" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
         </div>
     </aside>
 
@@ -55,10 +52,18 @@
             </div>
             <div class="header-right">
                 <div class="search-container">
-                    <input type="text" placeholder="Search songs..." class="search-input">
-                    <button class="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" placeholder="Search songs, artists, genres..." class="search-input">
+                        <select id="searchFilter" class="search-filter">
+                            <option value="all">All</option>
+                            <option value="title">Songs</option>
+                            <option value="artist">Artists</option>
+                            <option value="genre">Genres</option>
+                        </select>
+                        <button class="search-button">
+                            <img src="/img/Search.svg" alt="Search Icon">
+                        </button>
+                    </div>
                 </div>
             </div>
         </header>
