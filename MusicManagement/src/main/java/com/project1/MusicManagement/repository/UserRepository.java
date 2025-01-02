@@ -12,4 +12,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByRole(String role); // Kiểm tra xem role ADMIN đã tồn tại hay chưa
     @Query("SELECT u.role FROM User u WHERE u.id = :userId")
-    String findRoleByUserId(Long userId);}
+    String findRoleByUserId(Long userId);
+    User findUserById(Long id);
+}

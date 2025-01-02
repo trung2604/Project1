@@ -4,8 +4,12 @@ import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import com.project1.MusicManagement.dto.SongDetails;
 import com.project1.MusicManagement.entity.Song;
+import com.project1.MusicManagement.service.RecentlyPlayedService;
 import com.project1.MusicManagement.service.SongService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +32,8 @@ public class SongController {
     @Autowired
     private SongService songService;
 
+    @Autowired
+    RecentlyPlayedService recentlyPlayedService;
     // Upload bài hát
     @PostMapping("/upload/{userId}")
     public ResponseEntity<String> uploadSong(
@@ -114,31 +120,29 @@ public class SongController {
 
     // Phát nhạc
     @GetMapping("/play/{id}")
-    public ResponseEntity<InputStreamResource> playSong(@PathVariable Long id) {
+    public ResponseEntity<InputStreamResource> playSong(@PathVariable Long id, @RequestParam Long userId) {
         try {
-            // Lấy file bài hát từ dịch vụ
             File file = songService.getSongFile(id);
+            recentlyPlayedService.logRecentlyPlayed(userId, id);
 
-            // Mã hóa tên file để tránh lỗi với ký tự Unicode
-            String encodedFileName = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.toString());
-            encodedFileName = encodedFileName.replaceAll("\\+", "%20"); // Đảm bảo thay thế dấu cộng thành %20
+            String encodedFileName = URLEncoder.encode(file.getName(), StandardCharsets.UTF_8.toString())
+                    .replaceAll("\\+", "%20");
 
-            // Đọc file và tạo InputStreamResource
             FileInputStream fileInputStream = new FileInputStream(file);
             InputStreamResource resource = new InputStreamResource(fileInputStream);
 
-            // Trả về file âm thanh với header Content-Disposition đã mã hóa tên file
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType("audio/mpeg"))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedFileName + "\"")
+                    .header(HttpHeaders.ACCEPT_RANGES, "bytes") // Hỗ trợ tua
                     .body(resource);
         } catch (RuntimeException e) {
-            // Nếu không tìm thấy bài hát
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IOException e) {
-            // Nếu có lỗi đọc file
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+
 }

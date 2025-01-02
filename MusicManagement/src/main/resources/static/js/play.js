@@ -15,31 +15,59 @@ const playlistItems = document.getElementById("playlistItems");
 const loadingIndicator = document.getElementById("loadingIndicator");
 const shuffleButton = document.getElementById("shuffleButton");
 const repeatButton = document.getElementById("repeatButton");
+const volumeControl = document.getElementById("volumeControl");
+const volumeIcon = document.querySelector(".volume-icon");
 
 let isPlaying = false;
 let currentSongIndex = -1;
 let playlist = [];
 let isShuffle = false;
 let isRepeat = false;
+let currentAudioSource = null;
 
 const backendBaseUrl = "http://localhost:8000";
 
-// Lấy songId từ URL
 const songIdFromURL = Number(new URLSearchParams(window.location.search).get("songId"));
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const userId = user.id || null;
 
-// Định dạng thời gian (giây -> phút:giây)
 function formatTime(seconds) {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 }
 
-// Lấy danh sách phát từ API
 async function fetchPlaylist() {
     try {
         loadingIndicator.style.display = "block";
-        const response = await fetch("/api/songs/all");
-        playlist = await response.json();
+        const urlParams = new URLSearchParams(window.location.search);
+        const source = urlParams.get("source") || "songs";
+
+        let apiUrl;
+        switch (source) {
+            case "favorites":
+                apiUrl = `${backendBaseUrl}/api/favourites/user/${userId}`;
+                break;
+            case "playlist":
+                const playlistId = urlParams.get("playlistId");
+                apiUrl = `${backendBaseUrl}/api/playlists/${playlistId}/songs`;
+                break;
+            case "recently":
+                apiUrl = `${backendBaseUrl}/api/recently-played/${userId}`;
+                break;
+            default:
+                apiUrl = `${backendBaseUrl}/api/songs/all`;
+                break;
+        }
+
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        playlist = source === "favorites" ? data.map(item => item.song) : data;
+
+        if (!Array.isArray(playlist) || playlist.length === 0) {
+            playlistItems.innerHTML = "<li>No songs available</li>";
+            return;
+        }
 
         playlistItems.innerHTML = playlist
             .map((song, index) => `<li onclick="playSong(${index})">${song.title}</li>`)
@@ -48,10 +76,8 @@ async function fetchPlaylist() {
         if (songIdFromURL) {
             const songIndex = playlist.findIndex(song => song.id === songIdFromURL);
             if (songIndex !== -1) playSong(songIndex);
-        } else if (playlist.length > 0) {
-            playSong(0);
         } else {
-            playlistItems.innerHTML = "<li>No songs available</li>";
+            playSong(0);
         }
     } catch (error) {
         console.error("Error fetching playlist:", error);
@@ -61,12 +87,17 @@ async function fetchPlaylist() {
     }
 }
 
-// Phát bài hát
-function playSong(index) {
+async function playSong(index) {
     if (index < 0 || index >= playlist.length) return;
 
     currentSongIndex = index;
     const song = playlist[index];
+
+    if (!song.id || !userId) {
+        console.error("Invalid song ID or user ID", { song, userId });
+        alert("Cannot play this song due to missing information.");
+        return;
+    }
 
     songTitle.innerText = song.title || "Unknown Title";
     songArtist.innerText = `Artist: ${song.artist || "Unknown Artist"}`;
@@ -75,16 +106,30 @@ function playSong(index) {
     songImage.src = `${backendBaseUrl}${song.imgPath}`;
     songImage.onerror = () => (songImage.src = "https://via.placeholder.com/150");
 
-    audioPlayer.src = `${backendBaseUrl}/api/songs/play/${song.id}`;
-    audioPlayer.load();
+    const audioUrl = `${backendBaseUrl}/api/songs/play/${song.id}?userId=${userId}`;
 
-    loadingIndicator.style.display = "block";
-    audioPlayer.addEventListener("canplaythrough", () => {
-        loadingIndicator.style.display = "none";
-        audioPlayer.play();
+    if (currentAudioSource) {
+        URL.revokeObjectURL(currentAudioSource);
+    }
+
+    try {
+        const response = await fetch(audioUrl);
+        if (!response.ok) throw new Error('Failed to load audio');
+
+        const blob = await response.blob();
+        currentAudioSource = URL.createObjectURL(blob);
+        audioPlayer.src = currentAudioSource;
+
+        await audioPlayer.load();
+        await audioPlayer.play();
+
         isPlaying = true;
         playPauseButton.innerText = "⏸";
-    });
+    } catch (error) {
+        console.error("Error loading/playing song:", error);
+        alert("Failed to load or play the song.");
+        return;
+    }
 
     audioPlayer.ontimeupdate = () => {
         progress.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
@@ -95,30 +140,42 @@ function playSong(index) {
     updatePlaylistUI();
 }
 
-// Cập nhật giao diện danh sách phát
 function updatePlaylistUI() {
     Array.from(playlistItems.children).forEach((item, index) => {
         item.classList.toggle("active", index === currentSongIndex);
     });
 }
 
-// Điều khiển Shuffle
-if (shuffleButton) {
-    shuffleButton.addEventListener("click", () => {
-        isShuffle = !isShuffle;
-        shuffleButton.classList.toggle("active", isShuffle);
-    });
-}
+progress.addEventListener("input", () => {
+    if (audioPlayer && !isNaN(audioPlayer.duration)) {
+        const seekTime = (progress.value / 100) * audioPlayer.duration;
+        audioPlayer.currentTime = seekTime;
+        currentTimeDisplay.innerText = formatTime(seekTime);
 
-// Điều khiển Repeat
-if (repeatButton) {
-    repeatButton.addEventListener("click", () => {
-        isRepeat = !isRepeat;
-        repeatButton.classList.toggle("active", isRepeat);
-    });
-}
+        if (!isPlaying) {
+            audioPlayer.play()
+                .then(() => {
+                    isPlaying = true;
+                    playPauseButton.innerText = "⏸";
+                })
+                .catch(error => console.error("Error resuming playback:", error));
+        }
+    }
+});
 
-// Điều khiển khi bài hát kết thúc
+// Event listeners setup
+shuffleButton?.addEventListener("click", () => {
+    isShuffle = !isShuffle;
+    shuffleButton.classList.toggle("active", isShuffle);
+    shuffleButton.textContent = isShuffle ? "➡️" : "🔀";
+});
+
+repeatButton?.addEventListener("click", () => {
+    isRepeat = !isRepeat;
+    repeatButton.classList.toggle("active", isRepeat);
+    repeatButton.textContent = isRepeat ? "⏹️" : "🔁";
+});
+
 audioPlayer.addEventListener("ended", () => {
     if (isRepeat) {
         playSong(currentSongIndex);
@@ -133,21 +190,10 @@ audioPlayer.addEventListener("ended", () => {
     }
 });
 
-// Tua bài hát
-progress.addEventListener("input", () => {
-    if (audioPlayer.duration) {
-        const seekTime = (progress.value / 100) * audioPlayer.duration;
-        audioPlayer.currentTime = seekTime;
-        currentTimeDisplay.innerText = formatTime(seekTime);
-    }
-});
-
-// Điều chỉnh tốc độ phát
 playbackRateSelector.addEventListener("change", event => {
     audioPlayer.playbackRate = parseFloat(event.target.value);
 });
 
-// Điều khiển phát/tạm dừng
 playPauseButton.addEventListener("click", () => {
     if (isPlaying) {
         audioPlayer.pause();
@@ -159,9 +205,19 @@ playPauseButton.addEventListener("click", () => {
     isPlaying = !isPlaying;
 });
 
-// Điều khiển chuyển bài
+volumeControl.addEventListener("input", () => {
+    const volumeValue = volumeControl.value / 100;
+    audioPlayer.volume = volumeValue;
+    volumeIcon.textContent = volumeValue === 0 ? "🔇" : volumeValue < 0.5 ? "🔉" : "🔊";
+});
+
 prevButton.addEventListener("click", () => playSong((currentSongIndex - 1 + playlist.length) % playlist.length));
 nextButton.addEventListener("click", () => playSong((currentSongIndex + 1) % playlist.length));
 
-// Bắt đầu tải danh sách phát
+window.addEventListener("beforeunload", () => {
+    if (currentAudioSource) {
+        URL.revokeObjectURL(currentAudioSource);
+    }
+});
+
 fetchPlaylist();

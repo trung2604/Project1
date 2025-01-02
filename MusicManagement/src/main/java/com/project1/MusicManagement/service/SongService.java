@@ -6,9 +6,12 @@ import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import com.project1.MusicManagement.dto.SongDetails;
 import com.project1.MusicManagement.entity.Song;
+import com.project1.MusicManagement.repository.FavouriteRepository;
 import com.project1.MusicManagement.repository.SongRespository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +31,9 @@ public class SongService {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private FavouriteRepository favouriteRepository;
 
     @Value("${song.upload.dir}")
     private String uploadDir; // Đảm bảo sử dụng một biến uploadDir duy nhất
@@ -223,4 +229,5 @@ public class SongService {
     public List<Song> getAllSongs() {
         return songRepository.findAll();
     }
+
 }

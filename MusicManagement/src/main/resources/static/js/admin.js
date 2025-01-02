@@ -1,11 +1,13 @@
 /* admin.js */
 // Check if user is admin
-// window.onload = function() {
-//     const user = JSON.parse(localStorage.getItem('user') || '{}');
-//     if (!user.id || user.role !== 'admin') {
-//         window.location.href = '/api/auth/login';
-//     }
-// };
+window.onload = function() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.id || user.role !== 'Admin') {
+        window.location.href = '/api/auth/login';
+    }
+    document.querySelector(".user-name").innerText = user.username;
+
+};
 
 let currentSongs = [];
 let selectedSongId = null;

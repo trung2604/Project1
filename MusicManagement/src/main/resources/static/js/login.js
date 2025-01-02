@@ -18,17 +18,22 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
         const successMessage = document.getElementById('successMessage');
 
         if (response.ok) {
-            // Lưu thông tin người dùng vào localStorage và đợi cho đến khi lưu xong
-            await new Promise(resolve => {
-                localStorage.setItem('user', JSON.stringify(data));
-                resolve();
-            });
+            // Lưu id và role của user vào localStorage
+            const user = { id: data.id, role: data.role, username: data.username };
+            localStorage.setItem('user', JSON.stringify(user));
 
             successMessage.textContent = 'Login successful!';
             errorMessage.textContent = '';
 
-            // Chuyển hướng đến trang home
-            window.location.href = '/api/admin';
+            // Kiểm tra role và chuyển hướng đến trang tương ứng
+            if (data.role === 'Admin') {
+                window.location.href = '/api/admin';
+            } else if (data.role === 'User') {
+                window.location.href = '/api/songs';
+            } else {
+                errorMessage.textContent = 'Invalid user role!';
+                successMessage.textContent = '';
+            }
         } else {
             errorMessage.textContent = data.message || 'Invalid username or password!';
             successMessage.textContent = '';
