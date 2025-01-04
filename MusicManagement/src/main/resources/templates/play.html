@@ -8,24 +8,29 @@
     <link rel="stylesheet" href="/css/play.css">
 </head>
 <body>
-<h1>Music Player</h1>
-
 <div class="main-container">
     <!-- Song Details Section -->
-    <div id="songDetails">
-        <img id="songImage" src="" alt="Song Image" />
-        <h2 id="songTitle">Song Title</h2>
-        <p id="songArtist">Artist: Unknown Artist</p>
-        <p id="songAlbum">Album: Unknown Album</p>
-        <p id="songGenre">Genre: Unknown Genre</p>
+    <div class="sub-container">
+        <h3>Song Details</h3>
+        <div id="songDetails">
+            <div class="song-image-container">
+                <img id="songImage" src="" alt="Song Image" />
+            </div>
+            <h2 id="songTitle">Song Title</h2>
+            <p id="songArtist">Artist: Unknown Artist</p>
+            <p id="songAlbum">Album: Unknown Album</p>
+            <p id="songGenre">Genre: Unknown Genre</p>
+        </div>
     </div>
 
     <!-- Playlist Section -->
-    <div id="playlist">
+    <div class="sub-container">
         <h3>Playlist</h3>
-        <ul id="playlistItems">
-            <!-- Will be populated by JS -->
-        </ul>
+        <div id="playlist" aria-label="Playlist">
+            <ul id="playlistItems">
+                <!-- Will be populated by JS -->
+            </ul>
+        </div>
     </div>
 </div>
 

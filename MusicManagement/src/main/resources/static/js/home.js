@@ -2,6 +2,7 @@
 let currentSongs = [];
 let currentPlaylists = [];
 let currentPlaylistId = null;
+
 // Helper function to format duration
 function formatDuration(seconds) {
     const minutes = Math.floor(seconds / 60);
@@ -435,7 +436,10 @@ async function removeSongFromPlaylist(playlistId, songId) {
 // Toggle song in favorites
 async function toggleFavorite(songId) {
     const userId = getUserId();
-    if (!userId) return;
+    if (!userId) {
+        alert('You need to log in to use this feature.');
+        return;
+    }
 
     try {
         const isFavorite = await checkIfFavorite(songId);
@@ -448,10 +452,22 @@ async function toggleFavorite(songId) {
             body: JSON.stringify({ user: { id: userId }, song: { id: songId } })
         });
 
-        if (!response.ok) throw new Error('Failed to update favorites');
-        await fetchFavorites();
+        if (!response.ok) throw new Error('Failed to update favorite status');
+
+        // Update UI
+        const allFavoriteButtons = document.querySelectorAll(`.favorite-btn[data-song-id="${songId}"]`);
+        allFavoriteButtons.forEach(button => {
+            button.classList.toggle('liked', !isFavorite);
+            button.innerHTML = !isFavorite ? '❤️' : '🤍';
+        });
+
+        // Refresh favorites if needed
+        if (document.getElementById('favorites')) {
+            await fetchFavorites();
+        }
     } catch (error) {
-        handleError(error, 'update favorites');
+        console.error('Error updating favorite status:', error);
+        alert('Failed to update favorite status.');
     }
 }
 
@@ -481,12 +497,19 @@ async function removeFromFavorites(songId) {
         });
 
         if (!response.ok) throw new Error('Failed to remove song from favorites');
-        await fetchFavorites(); // Refresh favorites list
+
+        // Update favorite buttons in all sections
+        const allFavoriteButtons = document.querySelectorAll(`.favorite-btn[data-song-id="${songId}"]`);
+        allFavoriteButtons.forEach(button => {
+            button.classList.remove('liked');
+        });
+
+        // Refresh favorites list
+        await fetchFavorites();
     } catch (error) {
         handleError(error, 'remove from favorites');
     }
 }
-
 
 // Fetch user's favorite songs
 async function fetchFavorites() {
@@ -545,12 +568,13 @@ function renderFavorites(favoriteSongs) {
 
 
 
-function renderSongs(songs) {
+async function renderSongs(songs) {
     const songList = document.getElementById('songList');
     songList.innerHTML = '';
 
-    songs.forEach(song => {
+    for (const song of songs) {
         const imgSrc = song.imgPath ? `${window.location.origin}${song.imgPath}` : '/images/default.jpg';
+        const isFavorite = await checkIfFavorite(song.id);
 
         const listItem = document.createElement('li');
         listItem.className = 'song-item';
@@ -567,16 +591,17 @@ function renderSongs(songs) {
                     </div>
                     <div class="song-actions">
                         <button onclick="playSongFromSource(${song.id}, 'songs')" class="play-btn">Play</button>
-                        <button onclick="showAddToPlaylistModal(${song.id})" class="add-to-playlist-btn">Add to Playlist</button>
-                        <button onclick="toggleFavorite(${song.id})" class="favorite-btn">❤️</button>
+                        <button class="add-to-playlist-btn" onclick="showAddToPlaylistModal(${song.id})">Add to Playlist</button>
+                        <button class="favorite-btn ${isFavorite ? 'liked' : ''}" data-song-id="${song.id}" onclick="toggleFavorite(${song.id})">
+                            ${isFavorite ? '❤️' : '🤍'}
+                        </button>
                     </div>
                 </div>
             </div>
         `;
         songList.appendChild(listItem);
-    });
+    }
 }
-
 
 function renderPlaylists(playlists) {
     const playlistList = document.getElementById('playlistList');
@@ -604,14 +629,14 @@ function renderPlaylists(playlists) {
 }
 
 
-function renderRecentlyPlayed(songs) {
+async function renderRecentlyPlayed(songs) {
     const recentlyPlayedList = document.getElementById('recentList');
     recentlyPlayedList.innerHTML = '';
 
-    songs.forEach(song => {
-        // Ensure we're using the correct song object structure
-        const songData = song.song || song; // Handle both direct song objects and nested song objects
+    for (const song of songs) {
+        const songData = song.song || song;
         const imgSrc = songData.imgPath ? `${window.location.origin}${songData.imgPath}` : '/images/default.jpg';
+        const isFavorite = await checkIfFavorite(songData.id);
 
         const listItem = document.createElement('li');
         listItem.className = 'song-item';
@@ -629,14 +654,20 @@ function renderRecentlyPlayed(songs) {
                     <div class="song-actions">
                         <button onclick="playSongFromSource(${songData.id}, 'recently')" class="play-btn">Play</button>
                         <button onclick="showAddToPlaylistModal(${songData.id})" class="add-to-playlist-btn">Add to Playlist</button>
-                        <button onclick="toggleFavorite(${songData.id})" class="favorite-btn">❤️</button>
+                        <button 
+                            class="favorite-btn ${isFavorite ? 'liked' : ''}" 
+                            data-song-id="${songData.id}" 
+                            onclick="toggleFavorite(${songData.id})">
+                            ❤️
+                        </button>
                     </div>
                 </div>
             </div>
         `;
         recentlyPlayedList.appendChild(listItem);
-    });
+    }
 }
+
 
 
 
@@ -715,6 +746,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 targetSection.classList.remove("hidden");
                 // Update the section title
                 sectionTitle.textContent = item.querySelector("span").textContent;
+
+                // Fetch new data for the active section
+                if (item.dataset.section === "songs") {
+                    fetchSongs();
+                } else if (item.dataset.section === "favorites") {
+                    fetchFavorites();
+                } else if (item.dataset.section === "recent") {
+                    fetchRecentlyPlayed();
+                }
             }
         });
     });
