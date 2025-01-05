@@ -356,7 +356,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 #playbackRate {
-    background: transparent;
+    background: #27272a;
     border: none;
     color: #9ca3af;
     cursor: pointer;

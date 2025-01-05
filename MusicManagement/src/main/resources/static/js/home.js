@@ -66,12 +66,6 @@ async function fetchRecentlyPlayed() {
 
         const recentlyPlayedSongs = await response.json();
 
-        // Check if the returned data is valid
-        if (!Array.isArray(recentlyPlayedSongs) || recentlyPlayedSongs.length === 0) {
-            songList.innerHTML = '<li>No recently played songs available.</li>';
-            return;
-        }
-
         // Render the list of recently played songs
         renderRecentlyPlayed(recentlyPlayedSongs);
     } catch (error) {
@@ -333,16 +327,13 @@ async function playPlaylist(playlistId) {
         if (!response.ok) throw new Error('Failed to fetch playlist songs');
         const songs = await response.json();
 
-        // Tìm container hiển thị playlist
         const playlistList = document.getElementById('playlistList');
         const selectedPlaylist = currentPlaylists.find(p => p.playlistId === playlistId);
 
-        // Tạo phần hiển thị cho playlist đã chọn
         const playlistView = document.createElement('div');
         playlistView.id = 'selectedPlaylistView';
         playlistView.className = 'selected-playlist-view';
 
-        // Thêm tiêu đề và nút quay lại
         playlistView.innerHTML = `
             <div class="playlist-header">
                 <button onclick="showAllPlaylists()" class="back-btn">
@@ -352,14 +343,14 @@ async function playPlaylist(playlistId) {
             </div>
         `;
 
-        // Tạo danh sách bài hát
         const songList = document.createElement('ul');
         songList.className = 'song-list';
 
         if (songs.length === 0) {
             songList.innerHTML = '<li class="empty-message">No songs in this playlist.</li>';
         } else {
-            songs.forEach(song => {
+            for (const song of songs) {
+                const isFavorite = await checkIfFavorite(song.id); // Kiểm tra trạng thái yêu thích
                 const listItem = document.createElement('li');
                 listItem.className = 'song-item';
                 listItem.innerHTML = `
@@ -377,19 +368,19 @@ async function playPlaylist(playlistId) {
                             <div class="song-actions">
                                 <button onclick="playSongFromSource(${song.id}, 'playlist', ${playlistId})" class="play-btn">Play</button>
                                 <button onclick="removeSongFromPlaylist(${playlistId}, ${song.id})" class="remove-btn">Remove</button>
-                                <button onclick="toggleFavorite(${song.id})" class="favorite-btn">❤️</button>
+                                <button class="favorite-btn ${isFavorite ? 'liked' : ''}" data-song-id="${song.id}" onclick="toggleFavorite(${song.id})">
+                                    ${isFavorite ? '❤️' : '🤍'}
+                                </button>
                             </div>
                         </div>
                     </div>
                 `;
                 songList.appendChild(listItem);
-            });
+            }
         }
 
-        // Thêm danh sách bài hát vào phần hiển thị playlist
         playlistView.appendChild(songList);
 
-        // Ẩn tất cả playlists và hiển thị playlist hiện tại
         playlistList.innerHTML = '';
         playlistList.appendChild(playlistView);
 
@@ -398,6 +389,7 @@ async function playPlaylist(playlistId) {
         currentPlaylistId = null;
     }
 }
+
 
 // Function to show all playlists
 function showAllPlaylists() {
@@ -510,6 +502,35 @@ async function removeFromFavorites(songId) {
         handleError(error, 'remove from favorites');
     }
 }
+
+async function deleteAllRecentlyPlayed() {
+    const userId = getUserId();
+    if (!userId) {
+        alert("User ID is not available.");
+        return;
+    }
+
+    if (!confirm("Are you sure you want to delete all recently played songs?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/recently-played/delete-all/${userId}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || "Failed to delete all recently played songs.");
+        }
+
+        alert("All recently played songs have been deleted.");
+        fetchRecentlyPlayed(); // Refresh the recently played list
+    } catch (error) {
+        handleError(error, 'delete all recently played songs');
+    }
+}
+
 
 // Fetch user's favorite songs
 async function fetchFavorites() {
@@ -654,11 +675,8 @@ async function renderRecentlyPlayed(songs) {
                     <div class="song-actions">
                         <button onclick="playSongFromSource(${songData.id}, 'recently')" class="play-btn">Play</button>
                         <button onclick="showAddToPlaylistModal(${songData.id})" class="add-to-playlist-btn">Add to Playlist</button>
-                        <button 
-                            class="favorite-btn ${isFavorite ? 'liked' : ''}" 
-                            data-song-id="${songData.id}" 
-                            onclick="toggleFavorite(${songData.id})">
-                            ❤️
+                        <button class="favorite-btn ${isFavorite ? 'liked' : ''}" data-song-id="${song.id}" onclick="toggleFavorite(${song.id})">
+                            ${isFavorite ? '❤️' : '🤍'}
                         </button>
                     </div>
                 </div>

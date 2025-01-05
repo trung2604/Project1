@@ -106,17 +106,21 @@ function setupSongManagement() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = '.mp3';
+        fileInput.multiple = true; // Cho phép chọn nhiều file
         fileInput.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (file) {
+            const files = event.target.files;
+            if (files && files.length > 0) {
                 try {
                     const formData = new FormData();
-                    formData.append('file', file);
-
                     const user = JSON.parse(localStorage.getItem('user'));
                     if (!user || !user.id) {
                         window.location.href = '/api/auth/login';
                         return;
+                    }
+
+                    // Thêm tất cả file vào FormData
+                    for (const file of files) {
+                        formData.append('files', file);
                     }
 
                     const response = await fetch(`/api/songs/upload/${user.id}`, {
@@ -125,20 +129,21 @@ function setupSongManagement() {
                     });
 
                     if (response.ok) {
-                        alert('Song uploaded successfully!');
-                        fetchSongs(); // Update the song list after upload
+                        alert('All songs uploaded successfully!');
+                        fetchSongs(); // Cập nhật danh sách bài hát sau khi upload
                     } else {
                         const errorText = await response.text();
                         alert(`Upload failed: ${errorText}`);
                     }
                 } catch (error) {
-                    console.error('Error uploading song:', error);
-                    alert('An error occurred while uploading the song.');
+                    console.error('Error uploading songs:', error);
+                    alert('An error occurred while uploading the songs.');
                 }
             }
         };
         fileInput.click();
     });
+
 
     // Update Song
     updateBtn.addEventListener('click', () => {

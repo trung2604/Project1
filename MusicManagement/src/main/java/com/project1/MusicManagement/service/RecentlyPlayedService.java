@@ -69,4 +69,16 @@ public class RecentlyPlayedService {
         return response;
     }
 
+    public void deleteAllRecently(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new IllegalArgumentException("User with ID " + userId + " does not exist.");
+        }
+        try {
+            recentlyPlayedRepository.deleteByUserId(userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete recently played records for user ID: " + userId, e);
+        }
+    }
+
+
 }

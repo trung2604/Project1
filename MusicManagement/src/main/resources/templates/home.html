@@ -127,6 +127,12 @@
                 <div class="header-left">
                     <h1>Recently Played</h1>
                 </div>
+                <div class="header-right">
+                    <!-- Add the Delete All Button -->
+                    <button class="btn btn-danger" id="`deleteAllBtn" onclick="deleteAllRecentlyPlayed()" aria-label="Delete All Recently Played Songs">
+                        <i class="fas fa-trash"></i> Delete all
+                    </button>
+                </div>
             </div>
             <ul class="song-list" id="recentList">
                 <li>Loading songs...</li>

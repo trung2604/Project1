@@ -741,5 +741,34 @@ body {
     padding: 10px; /* Tăng khoảng cách giữa các option */
     font-size: 14px; /* Chữ dễ đọc */
 }
+.delete-all-btn {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-all-btn:hover {
+    background-color: #e63939;
+}
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
 
 

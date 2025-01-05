@@ -34,21 +34,23 @@ public class SongController {
 
     @Autowired
     RecentlyPlayedService recentlyPlayedService;
-    // Upload bài hát
     @PostMapping("/upload/{userId}")
-    public ResponseEntity<String> uploadSong(
+    public ResponseEntity<String> uploadSongs(
             @PathVariable Long userId,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("files") MultipartFile[] files) {
         try {
-            songService.uploadSong(file, userId);
-            return ResponseEntity.ok("Song uploaded successfully!");
+            for (MultipartFile file : files) {
+                songService.uploadSong(file, userId); // Gọi phương thức xử lý từng tệp
+            }
+            return ResponseEntity.ok("All songs uploaded successfully!");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the song.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while uploading the songs.");
         }
     }
+
 
     // Xóa bài hát
     @DeleteMapping("/delete/{id}/{userId}")

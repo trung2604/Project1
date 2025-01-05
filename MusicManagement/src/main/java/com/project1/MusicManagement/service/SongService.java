@@ -79,14 +79,25 @@ public class SongService {
             throw new RuntimeException("You do not have permission to upload file.");
         }
 
+        // Tạo thư mục nếu chưa tồn tại
+        File uploadFolder = new File(uploadDir);
+        if (!uploadFolder.exists()) {
+            uploadFolder.mkdirs();
+        }
+
         // Lưu file MP3 vào thư mục uploads
         String filePath = uploadDir + File.separator + fileName;
         File targetFile = new File(filePath);
 
-        // Kiểm tra nếu file đã tồn tại và tạo tên file mới nếu cần thiết
+        // Tạo tên file mới nếu file đã tồn tại
         int count = 1;
-        if(targetFile.exists()){
-            throw new RuntimeException("File already exists!");
+        while (targetFile.exists()) {
+            String baseName = fileName.substring(0, fileName.lastIndexOf('.'));
+            String extension = fileName.substring(fileName.lastIndexOf('.'));
+            fileName = baseName + "_" + count + extension;
+            filePath = uploadDir + File.separator + fileName;
+            targetFile = new File(filePath);
+            count++;
         }
         file.transferTo(targetFile);
 
@@ -94,10 +105,10 @@ public class SongService {
         Mp3File mp3File = new Mp3File(filePath);
 
         // Trích xuất thông tin metadata
-        String title = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getTitle() : "Unknown";
-        String artist = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getArtist() : "Unknown";
-        String album = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getAlbum() : "Unknown";
-        String genre = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getGenreDescription() : "Unknown";
+        String title = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getTitle() : "Unknown Title";
+        String artist = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getArtist() : "Unknown Artist";
+        String album = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getAlbum() : "Unknown Album";
+        String genre = mp3File.hasId3v2Tag() ? mp3File.getId3v2Tag().getGenreDescription() : "Unknown Genre";
         long duration = mp3File.getLengthInSeconds();
 
         // Gọi hàm extractAlbumArt để lấy URL ảnh bìa
