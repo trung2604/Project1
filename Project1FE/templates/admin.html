@@ -1,0 +1,96 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musically - Admin Dashboard</title>
+    <link rel="shortcut icon" href="/static/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/admin.css">
+
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="/static/favicon/Musically.svg" alt="Musically Logo">
+                <h2>Musically Admin</h2>
+            </div>
+        </div>
+
+<!--        <nav class="sidebar-menu">-->
+<!--            <ul class="menu">-->
+<!--                <li class="menu-item active">-->
+<!--                    <a href="#song-management">-->
+<!--                        <i class="fas fa-music"></i>-->
+<!--                        <span>Manage Songs</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </nav>-->
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name"></span>
+                </div>
+            </div>
+            <button class="btn btn-logout" onclick="logout()" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="content-header">
+            <div class="header-left">
+                <h1>Song Management</h1>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" placeholder="Search songs, artists, genres..." class="search-input">
+                        <select id="searchFilter" class="search-filter">
+                            <option value="all">All</option>
+                            <option value="title">Songs</option>
+                            <option value="artist">Artists</option>
+                            <option value="genre">Genres</option>
+                        </select>
+                        <button class="search-button">
+                            <img src="/static/img/Search.svg" alt="Search Icon">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Song Management Section -->
+        <section id="song-management" class="content-section">
+            <div class="song-management-controls">
+                <button class="btn btn-primary" id="uploadSong">
+                    <i class="fas fa-upload"></i> Upload Songs/Folder
+                </button>
+                <button class="btn btn-warning" id="updateSong">
+                    <i class="fas fa-edit"></i> Update Song
+                </button>
+                <button class="btn btn-danger" id="deleteSong">
+                    <i class="fas fa-trash"></i> Delete Song
+                </button>
+            </div>
+            <div class="song-list" id="songList">
+                <p>Loading songs...</p>
+            </div>
+            <div id="songManagementContent">
+                <p>Select a song to manage its details.</p>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script src="/static/js/admin.js"></script>
+</body>
+</html>

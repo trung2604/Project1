@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="shortcut icon" href="/static/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/play.css">
+</head>
+<body>
+<div class="main-container">
+    <!-- Song Details Section -->
+    <div class="sub-container">
+        <h3>Song Details</h3>
+        <div id="songDetails">
+            <div class="song-image-container">
+                <img id="songImage" src="" alt="Song Image" />
+            </div>
+            <h2 id="songTitle">Song Title</h2>
+            <p id="songArtist">Artist: Unknown Artist</p>
+            <p id="songAlbum">Album: Unknown Album</p>
+            <p id="songGenre">Genre: Unknown Genre</p>
+        </div>
+    </div>
+
+    <!-- Playlist Section -->
+    <div class="sub-container">
+        <h3>Playlist</h3>
+        <div id="playlist" aria-label="Playlist">
+            <ul id="playlistItems">
+                <!-- Will be populated by JS -->
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Player Controls Section -->
+<div class="player-controls">
+    <div id="progressContainer">
+        <span id="currentTime">0:00</span>
+        <input id="progress" type="range" min="0" max="100" value="0">
+        <span id="totalTime">0:00</span>
+    </div>
+
+    <div class="controls-wrapper">
+        <div class="left-controls">
+            <button id="shuffleButton" class="control-button">🔀</button>
+            <div id="playbackControl">
+                <select id="playbackRate" class="control-button">
+                    <option value="0.5">0.5x</option>
+                    <option value="1" selected>1x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="controls">
+            <button id="prevButton" class="control-button">⏮</button>
+            <button id="playPauseButton" class="control-button">▶️</button>
+            <button id="nextButton" class="control-button">⏭</button>
+        </div>
+
+        <div class="right-controls">
+            <button id="repeatButton" class="control-button">🔁</button>
+            <div class="volume-control">
+                <span class="volume-icon">🔊</span>
+                <input type="range" id="volumeControl" min="0" max="100" value="100">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loadingIndicator" style="display: none;">Loading...</div>
+
+<script src="/static/js/play.js"></script>
+</body>
+</html>

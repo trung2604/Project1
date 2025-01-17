@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Head section remains the same -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musically - Dashboard</title>
+    <link rel="shortcut icon" href="/static/favicon/Musically.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/static/css/home.css">
+</head>
+
+<body>
+<div class="dashboard-container">
+    <!-- Sidebar remains the same -->
+    <aside class="sidebar" aria-label="Sidebar Navigation">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="/static/favicon/Musically.svg" alt="Musically Logo" class="logo-img">
+                <h2>Musically</h2>
+            </div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <ul class="menu">
+                <li class="menu-item active" data-section="playlist">
+                    <a href="javascript:void(0)" aria-label="View Playlists">
+                        <i class="fas fa-list"></i>
+                        <span>Playlists</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-section="songs">
+                    <a href="javascript:void(0)" aria-label="View Songs">
+                        <i class="fas fa-music"></i>
+                        <span>Songs</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-section="favorites">
+                    <a href="javascript:void(0)" aria-label="View Favorites">
+                        <i class="fas fa-heart"></i>
+                        <span>Favorites</span>
+                    </a>
+                </li>
+                <li class="menu-item" data-section="recent">
+                    <a href="javascript:void(0)" aria-label="View Recently Played">
+                        <i class="fas fa-history"></i>
+                        <span>Recently Played</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name"></span>
+                </div>
+            </div>
+            <button class="btn btn-logout" onclick="logout()" aria-label="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Songs Section -->
+        <section id="songs" class="content-section hidden">
+            <div class="content-header">
+                <div class="header-left">
+                    <h1>Songs</h1>
+                </div>
+                <div class="header-right">
+                    <div class="search-container">
+                        <div class="search-wrapper">
+                            <input type="text" id="searchInput" placeholder="Search songs, artists, genres..." class="search-input">
+                            <select id="searchFilter" class="search-filter">
+                                <option value="all">All</option>
+                                <option value="title">Songs</option>
+                                <option value="artist">Artists</option>
+                                <option value="genre">Genres</option>
+                            </select>
+                            <button class="search-button">
+                                <img src="/static/img/Search.svg" alt="Search Icon">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <ul class="song-list" id="songList">
+                <li>Loading songs...</li>
+            </ul>
+        </section>
+
+        <!-- Playlists Section -->
+        <section id="playlist" class="content-section">
+            <div class="content-header">
+                <div class="header-left">
+                    <h1>Your Playlists</h1>
+                </div>
+            </div>
+            <div class="playlist-controls">
+                <button class="btn btn-primary" onclick="createPlaylist()" aria-label="Create New Playlist">
+                    <i class="fas fa-plus"></i> New Playlist
+                </button>
+            </div>
+            <ul class="playlist-list" id="playlistList">
+                <li>Loading playlists...</li>
+            </ul>
+        </section>
+
+        <!-- Favorites Section -->
+        <section id="favorites" class="content-section hidden">
+            <div class="content-header">
+                <div class="header-left">
+                    <h1>Favorites</h1>
+                </div>
+            </div>
+            <ul class="song-list" id="favoriteList">
+                <li>Loading favorite songs...</li>
+            </ul>
+        </section>
+
+        <!-- Recently Played Section -->
+        <section id="recent" class="content-section hidden">
+            <div class="content-header">
+                <div class="header-left">
+                    <h1>Recently Played</h1>
+                </div>
+                <div class="header-right">
+                    <!-- Add the Delete All Button -->
+                    <button class="btn btn-danger" id="`deleteAllBtn" onclick="deleteAllRecentlyPlayed()" aria-label="Delete All Recently Played Songs">
+                        <i class="fas fa-trash"></i> Delete all
+                    </button>
+                </div>
+            </div>
+            <ul class="song-list" id="recentList">
+                <li>Loading songs...</li>
+            </ul>
+        </section>
+    </main>
+</div>
+
+<script src="/static/js/home.js"></script>
+</body>
+</html>
