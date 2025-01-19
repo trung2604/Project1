@@ -1,7 +1,6 @@
 package com.project1.MusicManagement.repository;
 
 import com.project1.MusicManagement.entity.Playlist;
-import com.project1.MusicManagement.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

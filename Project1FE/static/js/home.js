@@ -560,6 +560,7 @@ async function removeFromFavorites(songId) {
     );
     allFavoriteButtons.forEach((button) => {
       button.classList.remove("liked");
+      button.innerHTML = "🤍";
     });
 
     // Refresh favorites list
